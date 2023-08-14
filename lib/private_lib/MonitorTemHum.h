@@ -18,6 +18,7 @@ public:
     void setPinHum(int pin);
     void avaliableTempAndHum();
     void setupSensor(int pin, DHTesp::DHT_MODEL_t model);
+    void sendValue(String urlValue);
 };
 MonitorTemHum::MonitorTemHum()
 {
@@ -34,6 +35,16 @@ void MonitorTemHum::setPinHum(int pin){
     this->pinoutHum = pin;
     pinMode(this->pinoutHum,OUTPUT);
 }
+void MonitorTemHum::sendValue(String urlValue){
+    this->http.begin(urlValue);
+    int responsecode = this->http.GET();
+    if(responsecode == 200){
+      Serial.println("Valor atualizada com sucesso!");
+    }else{
+      Serial.println("Erro ocorrido na atualização da humidade");
+    }
+    this->http.end();
+}
 void MonitorTemHum::avaliableTempAndHum(){
     this->temperatura = this->sensor.getTemperature();
     this->humidade = this->sensor.getHumidity();
@@ -41,13 +52,8 @@ void MonitorTemHum::avaliableTempAndHum(){
     Serial.println(this->temperatura);
     Serial.print("Humidade atual: ");
     Serial.println(this->humidade);
-    Serial.println(this->urlTemperatura+String(this->temperatura));
-    this->http.begin(this->urlHumidade+String(this->humidade));
-    this->http.GET();
-    this->http.end();
-    this->http.begin(this->urlTemperatura+String(this->temperatura));
-    this->http.GET();
-    this->http.end();
+    this->sendValue(this->urlHumidade + String(this->humidade));
+    this->sendValue(this->urlTemperatura + String(this->temperatura));
     if(this->humidade >= 70.00f && this->temperatura < 30.00f){
       digitalWrite(this->pinoutHum,HIGH);
       digitalWrite(this->pinoutTemp,LOW);
