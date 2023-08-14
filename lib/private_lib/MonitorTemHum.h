@@ -5,8 +5,6 @@ class MonitorTemHum
 private:
     /* data */
     HTTPClient http;
-    String urlTemperatura = "https://api.thingspeak.com/update?api_key=ALWFZTNL7L1FOI9Y&field1=";
-    String urlHumidade = "https://api.thingspeak.com/update?api_key=ALWFZTNL7L1FOI9Y&field2=";
     int pinoutTemp;
     int pinoutHum;
     float temperatura;
@@ -18,7 +16,7 @@ public:
     void setPinHum(int pin);
     void avaliableTempAndHum();
     void setupSensor(int pin, DHTesp::DHT_MODEL_t model);
-    void sendValue(String urlValue);
+    void sendValues();
 };
 MonitorTemHum::MonitorTemHum()
 {
@@ -35,8 +33,9 @@ void MonitorTemHum::setPinHum(int pin){
     this->pinoutHum = pin;
     pinMode(this->pinoutHum,OUTPUT);
 }
-void MonitorTemHum::sendValue(String urlValue){
-    this->http.begin(urlValue);
+void MonitorTemHum::sendValues(){
+    String url = "https://api.thingspeak.com/update?api_key=ALWFZTNL7L1FOI9Y&field1="+String(this->temperatura)+"&field2="+String(this->humidade);
+    this->http.begin(url);
     int responsecode = this->http.GET();
     if(responsecode == 200){
       Serial.println("Valor atualizada com sucesso!");
@@ -52,8 +51,7 @@ void MonitorTemHum::avaliableTempAndHum(){
     Serial.println(this->temperatura);
     Serial.print("Humidade atual: ");
     Serial.println(this->humidade);
-    this->sendValue(this->urlHumidade + String(this->humidade));
-    this->sendValue(this->urlTemperatura + String(this->temperatura));
+    this->sendValues();
     if(this->humidade >= 70.00f && this->temperatura < 30.00f){
       digitalWrite(this->pinoutHum,HIGH);
       digitalWrite(this->pinoutTemp,LOW);
