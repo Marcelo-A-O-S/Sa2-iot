@@ -17,5 +17,5 @@ void setup() {
 }
 void loop() {
     monitor->avaliableTempAndHum();
-    delay(1000);
+    delay(2000);
 }
