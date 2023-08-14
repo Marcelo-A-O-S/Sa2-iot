@@ -19,9 +19,7 @@ public:
     void setPinHum(int pin);
     void avaliableTempAndHum();
     void setupSensor(int pin, DHTesp::DHT_MODEL_t model);
-
 };
-
 MonitorTemHum::MonitorTemHum()
 {
 }
@@ -51,6 +49,10 @@ void MonitorTemHum::avaliableTempAndHum(){
       this->http.begin(urlHumidade);
       this->http.GET();
       this->http.end();
+      urlTemperatura.concat(this->temperatura);
+      this->http.begin(urlTemperatura);
+      this->http.GET();
+      this->http.end();
       digitalWrite(this->pinoutHum,HIGH);
       digitalWrite(this->pinoutTemp,LOW);
 
@@ -61,6 +63,10 @@ void MonitorTemHum::avaliableTempAndHum(){
       Serial.println(this->humidade);
       urlTemperatura.concat(this->temperatura);
       this->http.begin(urlTemperatura);
+      this->http.GET();
+      this->http.end();
+      urlHumidade.concat(this->humidade);
+      this->http.begin(urlHumidade);
       this->http.GET();
       this->http.end();
       digitalWrite(this->pinoutTemp,HIGH);
